@@ -2,11 +2,8 @@ package Alien;
 
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 
-import javax.swing.Timer;
-
-public class Badguy {
+public class Goodguy {
 	
 	private int xCoord = 0;
 	private int yCoord = 0;
@@ -14,10 +11,10 @@ public class Badguy {
 	private int height = 10;
 	private Image img;
 	
-		/**
+	/**
 	 * Goodguy default constructor
 	 */
-	public Badguy() {
+	public Goodguy() {
 		setxCoord(10);
 		setyCoord(10);
 		setWidth(30);
@@ -33,13 +30,48 @@ public class Badguy {
 	 * @param w initial width
 	 * @param h initial height 
 	 */
-	public Badguy(int x, int y, int w, int h, String imgpath) {
+	public Goodguy(int x, int y, int w, int h, String imgpath) {
 		setxCoord(x);
 		setyCoord(y);
 		setWidth(w);
 		setHeight(h);
 		setImg(imgpath);
 	}
+	
+	public void moveIt (int direction, int w, int h) {
+		int speed = 40;
+		int x =getxCoord();
+		int y = getyCoord();
+		if (direction == 39) {
+			if (x > w) {
+				x = x - speed;
+			}
+			x = x + speed;
+			setxCoord(x);
+			setImg("sprites/fighter.png");
+		} else if (direction == 38) {
+			if (y < 0) {
+				y =y + speed;
+			}
+			y = y - speed;
+			setyCoord(y);
+			setImg("sprites/fighter.png");
+		} else if (direction == 40) {
+			if (y > h - 10) {
+				y = y - speed;
+			}
+			y = y + speed;
+			setyCoord(y);
+			setImg("sprites/fighter.png");
+		}else if ( direction == 37) {
+			if (x < 0) {
+				x = x + speed;
+			}
+			x = x - speed;
+			setxCoord(x);
+			setImg("sprites/fighter.png");
+			}
+		}
 	
 	public void setImg(String imgpath) {
 		this.img = Toolkit.getDefaultToolkit().getImage(imgpath);

@@ -1,10 +1,9 @@
 package Alien;
 
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 
-public class Objects {
+public class Lasers {
 	
 	private int xCoord = 0;
 	private int yCoord = 0;
@@ -12,15 +11,32 @@ public class Objects {
 	private int height = 10;
 	private Image img;
 	
-	public Objects(int x, int y, int w, int h, String imgpath) {
+	/**
+	 * Goodguy default constructor
+	 */
+	public Lasers() {
+		setxCoord(10);
+		setyCoord(10);
+		setWidth(30);
+		setHeight(30);
+		setImg(".../File/spongebob.jpg");
+	
+	}
+	
+	/**
+	 * Goodguy overloaded constructor
+	 * @param x initial x location
+	 * @param y initial y location
+	 * @param w initial width
+	 * @param h initial height 
+	 */
+	public Lasers(int x, int y, int w, int h, String imgpath) {
 		setxCoord(x);
 		setyCoord(y);
 		setWidth(w);
 		setHeight(h);
 		setImg(imgpath);
 	}
-	
-	
 	
 	public void setImg(String imgpath) {
 		this.img = Toolkit.getDefaultToolkit().getImage(imgpath);
@@ -65,4 +81,5 @@ public class Objects {
 	public void setImg(Image img) {
 		this.img = img;
 	}
+	
 }

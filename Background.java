@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 
-public class Objects {
+public class Background {
 	
 	private int xCoord = 0;
 	private int yCoord = 0;
@@ -12,7 +12,7 @@ public class Objects {
 	private int height = 10;
 	private Image img;
 	
-	public Objects(int x, int y, int w, int h, String imgpath) {
+	public Background(int x, int y, int w, int h, String imgpath) {
 		setxCoord(x);
 		setyCoord(y);
 		setWidth(w);
