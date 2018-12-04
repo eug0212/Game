@@ -39,7 +39,7 @@ public class Goodguy {
 	}
 	
 	public void moveIt (int direction, int w, int h) {
-		int speed = 40;
+		int speed = 30;
 		int x =getxCoord();
 		int y = getyCoord();
 		if (direction == 39) {
@@ -71,7 +71,8 @@ public class Goodguy {
 			setxCoord(x);
 			setImg("sprites/fighter.png");
 			}
-		}
+		
+	}
 	
 	public void setImg(String imgpath) {
 		this.img = Toolkit.getDefaultToolkit().getImage(imgpath);

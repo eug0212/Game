@@ -1,223 +1,326 @@
 package Alien;
 
 import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.InputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
-import java.util.Scanner;
-import javax.swing.Timer;
-
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.sound.sampled.AudioInputStream; 
 import javax.sound.sampled.AudioSystem; 
 import javax.sound.sampled.Clip; 
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.TargetDataLine;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 
-public class MyCanvas extends Canvas implements KeyListener,ActionListener{
+public class MyCanvas extends Canvas implements KeyListener{
 	 // global variables - accessible in all methods
-	Goodguy fighter = new Goodguy(680, 800, 60, 60,"sprites/fighter.png");
+	Goodguy fighter = new Goodguy(300, 400, 60, 60,"sprites/fighter.png");
 	Background gameBackground = new Background (0,0,1440,900, "sprites/background.jpeg");
 	Objects life1 = new Objects (20, 800, 40, 40, "sprites/fighter.png");
 	Objects life2 = new Objects (65, 800, 40, 40, "sprites/fighter.png");
+	Objects loseScreen = new Objects(0, 0, 1440, 900, "sprites/gameOver.jpeg");
 	LinkedList badguys = new LinkedList();
 	LinkedList lasers = new LinkedList();
-	Timer t = new Timer(5, this);
-	int x1 = 1600;
-	int x2 = 1700;
-	int x3 = 1800;
-	int y1 = 70;
-	int y2 = 200;
-	int vel = 1;
+	boolean gameOver = false;
+	public static int health = 100;
+	public static long period = 100L;
+	public static int bulletSizew = 5;
+	public static int bulletSizeh = 30;
+	public static int points = 0;
 
-	public MyCanvas() {
-		this.setSize(1440,900); // set same size as MyScreen
-		this.addKeyListener(this); // add the listener to your canvas
-//		playIt("meglovania.wav");
 
-		Random rand = new Random();
-		int winWidth = this.getWidth();
-		int winHeight = this.getHeight();
-		for (int i = 0; i < 2; i++) {
-			int rx = rand.nextInt(winWidth);
-			int ry = rand.nextInt(winHeight);
-			Badguy bg = new Badguy (rand.nextInt(1500), rand.nextInt(900), 70, 70, "sprites/badguy1.png");
-			Rectangle r = new Rectangle(100,100,30,30);
-			if (r.contains(fighter.getxCoord(), fighter.getyCoord())) {
-				continue;
-			}
-			badguys.add(bg);
-		}
-	}
+    
+	public static enum STATE {
+		MENU,
+		GAME;
+	};
 	
-	 
-	
-//	public void playIt(String filename) {
-//		
-//		try {
-//	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("File/meglovania.wav").getAbsoluteFile());
-//	        Clip clip = AudioSystem.getClip();
-//	        clip.open(audioInputStream);
-//	        clip.start();
-//	    } catch(Exception ex) {
-//	        System.out.println("Error with playing sound.");
-//	        ex.printStackTrace();
-//	    }
-//		
-//	}
-	
-	@Override
-	public void paint (Graphics g) {
-		//g.fillOval(100,100,10,10);
-		//draw good guy
-		g.drawImage(gameBackground.getImg(), gameBackground.getxCoord(), gameBackground.getyCoord(), gameBackground.getWidth(),gameBackground.getHeight(), this );
-		g.drawImage(fighter.getImg(), fighter.getxCoord(), fighter.getyCoord(),fighter.getWidth(), fighter.getHeight(), this);
-		g.drawImage(life1.getImg(), life1.getxCoord(), life1.getyCoord(),life1.getWidth(), life1.getHeight(), this);
-		g.drawImage(life2.getImg(), life2.getxCoord(), life2.getyCoord(),life2.getWidth(), life2.getHeight(), this);
-		//g.fillRect(x, 30, 50, 50);
-		t.start();
+	public static STATE State = STATE.MENU;	
+	private Menu menu;
 
-		for (int i = 0; i < badguys.size(); i++) {
-			Badguy bg = (Badguy) badguys.get(i);
-			g.drawImage(bg.getImg(), x1, y1, bg.getWidth(), bg.getHeight(), this);
-			Rectangle r = new Rectangle(x1, y1, bg.getWidth(), bg.getHeight());
-			t.start();
+		
+			public MyCanvas() {
+				this.setSize(1440,900); 
+				this.addKeyListener(this); 
+				this.addKeyListener(new KeyPressed());
+				menu = new Menu();
+				
+				
+					if (!gameOver) {	
+						playIt("music/Undertale.wav");
+					} else if (gameOver) {
+						playIt("music/GameOver.wav");
+					}
+						Random rand = new Random();
+						int winWidth = this.getWidth();
+						int winHeight = this.getHeight();
+						for (int i = 0; i < 70; i++) {
+							int rx = rand.nextInt(winWidth);
+							int ry = rand.nextInt(winHeight);
+							Badguy bg = new Badguy(rx + 2500, ry, 60, 60, "sprites/badguy1.png");
+							Badguy bgx = new Badguy(rx + 10000, ry, 60, 60, "sprites/badguy1.png");
+							Badguy bg2x = new Badguy(rx + 10000, ry, 60, 60, "sprites/badguy2.png");
+							Badguy bg3x = new Badguy(rx + 10000, ry, 60, 60, "sprites/badguy3.png");
+
+							Badguy bg2 = new Badguy(rx + 5000, ry, 60, 60, "sprites/badguy2.png");
+							Badguy bg3 = new Badguy(rx + 7500, ry, 60, 60, "sprites/badguy3.png");
+
+							
+							Rectangle r = new Rectangle(bg.getxCoord(),bg.getyCoord(),100,100);
+							Rectangle r2 = new Rectangle(bg.getxCoord(),bg.getyCoord(),100,100);
+							Rectangle r3 = new Rectangle(bg.getxCoord(),bg.getyCoord(),100,100);
+
+							Rectangle gg = new Rectangle(fighter.getxCoord(),fighter.getyCoord(),fighter.getWidth(),fighter.getHeight());	
+							if (r.intersects(gg)) {
+								badguys.remove(i);
+							}
+							if (r2.intersects(gg)) {
+								badguys.remove(i);
+							}
+							if (r3.intersects(gg)) {
+								badguys.remove(i);
+							}
+							badguys.add(bg);
+							badguys.add(bg2);
+							badguys.add(bg3);
+							badguys.add(bgx);
+							badguys.add(bg2x);
+							badguys.add(bg3x);
+
+						}
+						TimerTask wave1 = new TimerTask() {
+							
+							public void run() {
+								if (!gameOver) {
+									for(int i = 0; i < badguys.size(); i++) {// draw bad guys
+					                    Badguy bg = (Badguy) badguys.get(i);
+					        			Random rand = new Random();
+					        			int flightPattern = rand.nextInt(6);
+					                   
+					        			if (bg.getxCoord() >= 1440) {
+					        				bg.setxCoord(bg.getxCoord() - 20);
+					        			}
+					        			if (bg.getxCoord() <= 1440) {
+					                    	if (flightPattern == 0) {
+					                    	bg.setxCoord(bg.getxCoord() - 20);	
+					                    	} else if (flightPattern == 1) {
+						                    	bg.setxCoord(bg.getxCoord() - 20);	
+						                    	bg.setyCoord(bg.getyCoord() + 20);
+					                    	}  else if (flightPattern == 2) {
+						                    	bg.setxCoord(bg.getxCoord() - 20);	
+						                    	bg.setyCoord(bg.getyCoord() + 10);
+					                    	}
+					                    	else if (flightPattern == 3) {
+						                    	bg.setxCoord(bg.getxCoord() - 20);	
+						                    	bg.setyCoord(bg.getyCoord() + 20);
+						                    	if(bg.getxCoord() <= 0) {
+						                    		bg.setxCoord(bg.getxCoord()+20);
+						                    	}
+					                    	}
+						                 	else if (flightPattern == 4) {
+						                    	bg.setxCoord(bg.getxCoord() - 20);	
+						                    	bg.setyCoord(bg.getyCoord() - 20);
+						                    	if(bg.getxCoord() <= 0) {
+						                    		bg.setxCoord(bg.getxCoord()+7);
+						                    	}
+					                    	}else if (flightPattern == 5) {
+						                    	bg.setxCoord(bg.getxCoord() - 20);	
+						                    	bg.setyCoord(bg.getyCoord() - 20);
+						                    	if(bg.getxCoord() <= 0) {
+						                    		bg.setxCoord(bg.getxCoord()+10);
+						                    	}
+					                    	}
+					                    }	
+					                repaint();
+									} 
+								}
+							}
+			        };
+			        	Timer timer = new Timer("Timer"); 
+				        long delay  = 10L;
+				        timer.scheduleAtFixedRate(wave1, delay, period);		
+				        
+				        
+				    	
+						//TimerTask wave2 = new TimerTask() {
+//							
+//							public void run() {
+//								if (!gameOver) {
+//									for(int i = 0; i < badguys2.size(); i++) {// draw bad guys
+//					                    Badguy bg = (Badguy) badguys2.get(i);
+//					        			Random rand = new Random();
+//					        			int flightPattern = rand.nextInt(6);
+//					                   
+//					        			if (bg.getxCoord() >= 1440) {
+//					        				bg.setxCoord(bg.getxCoord() - 20);
+//					        			}
+//					        			if (bg.getxCoord() <= 1440) {
+//					                    	if (flightPattern == 0) {
+//					                    	bg.setxCoord(bg.getxCoord() - 20);	
+//					                    	} else if (flightPattern == 1) {
+//						                    	bg.setxCoord(bg.getxCoord() - 20);	
+//						                    	bg.setyCoord(bg.getyCoord() + 20);
+//					                    	}  else if (flightPattern == 2) {
+//						                    	bg.setxCoord(bg.getxCoord() - 20);	
+//						                    	bg.setyCoord(bg.getyCoord() + 10);
+//					                    	}
+//					                    	else if (flightPattern == 3) {
+//						                    	bg.setxCoord(bg.getxCoord() - 20);	
+//						                    	bg.setyCoord(bg.getyCoord() + 20);
+//						                    	if(bg.getxCoord() <= 0) {
+//						                    		bg.setxCoord(bg.getxCoord()+20);
+//						                    	}
+//					                    	}
+//						                 	else if (flightPattern == 4) {
+//						                    	bg.setxCoord(bg.getxCoord() - 20);	
+//						                    	bg.setyCoord(bg.getyCoord() - 20);
+//						                    	if(bg.getxCoord() <= 0) {
+//						                    		bg.setxCoord(bg.getxCoord()+7);
+//						                    	}
+//					                    	}else if (flightPattern == 5) {
+//						                    	bg.setxCoord(bg.getxCoord() - 20);	
+//						                    	bg.setyCoord(bg.getyCoord() - 20);
+//						                    	if(bg.getxCoord() <= 0) {
+//						                    		bg.setxCoord(bg.getxCoord()+10);
+//						                    	}
+//					                    	}
+//					                    }	
+//					                repaint();
+//									} 
+//								}
+//							}
+//			        };
+//			        	Timer timer2 = new Timer("Timer"); 
+//				        timer2.scheduleAtFixedRate(wave1, delay, period);	
+			}		
+						
+				
 			
-			for (int j = 0; j < 1000000000; j++) {
-				Lasers k = (Lasers) lasers.get(j);
-				if (k.getxCoord() > this.getWidth()) { lasers.remove(k);}
-					k.setxCoord(k.getxCoord() + 1);
-					g.drawImage(k.getImg(), k.getxCoord(), k.getyCoord(), k.getWidth(), k.getHeight(), this);
+			 
+			 
+			
+			public void playIt(String musicPath) {
+					try {
+						AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(musicPath).getAbsoluteFile());
+						Clip clip = AudioSystem.getClip();
+						clip.open(audioInputStream);
+						clip.start();
+					} catch(Exception ex) {
+						System.out.println("Error with playing sound.");
+						ex.printStackTrace();
+					}
+			}
+			
+			@Override
+			public void paint (Graphics g) {
+				if (State == STATE.GAME) {
+					g.drawImage(gameBackground.getImg(), gameBackground.getxCoord(), gameBackground.getyCoord(), gameBackground.getWidth(),gameBackground.getHeight(), this );
+					g.drawImage(fighter.getImg(), fighter.getxCoord(), fighter.getyCoord(),fighter.getWidth(), fighter.getHeight(), this);
 					
-					Rectangle kr = new Rectangle(k.getxCoord(), k.getyCoord(), k.getWidth(), k.getHeight());		
-					if (kr.intersects(r)) {
-						badguys.remove(i);
-						lasers.remove(i);
+					for (int i = 0; i < badguys.size(); i++) {
+						Badguy bg = (Badguy) badguys.get(i);
+						g.drawImage(bg.getImg(), bg.getxCoord(), bg.getyCoord(), bg.getWidth(), bg.getHeight(), this);
+						Rectangle r = new Rectangle(bg.getxCoord(), bg.getyCoord(), bg.getWidth(), bg.getHeight());
+						
+						for (int j = 0; j < lasers.size(); j++) {
+							Lasers k = (Lasers) lasers.get(j);
+							if (k.getxCoord() > this.getWidth()) { lasers.remove(k);}
+								k.setxCoord(k.getxCoord() + 1);
+								g.drawImage(k.getImg(), k.getxCoord(), k.getyCoord(), k.getWidth() + 10, k.getHeight() + 10, this);
+								
+								Rectangle kr = new Rectangle(k.getxCoord(), k.getyCoord(), k.getWidth() + 50, k.getHeight() + 50);		
+								if (k.getxCoord() > 1500) {
+									lasers.remove(i);
+								}
+								if (kr.intersects(r)) {
+									badguys.remove(i);
+									lasers.remove(i);
+									points = points + 1;
+								}
+								if (gameOver) {
+									lasers.remove(i);
+									badguys.remove(i);
+								}
+							repaint();
+						}
 					}
-				repaint();
-			}
-		}
-		for (int i = 0; i < badguys.size(); i++) {
-			Badguy bg = (Badguy) badguys.get(i);
-			g.drawImage(bg.getImg(), x1, y2, bg.getWidth(), bg.getHeight(), this);
-			Rectangle r = new Rectangle(x1, y2, bg.getWidth(), bg.getHeight());
-			t.start();
-			
-			for (int j = 0; j < 1000000000; j++) {
-				Lasers k = (Lasers) lasers.get(j);
-				if (k.getxCoord() > this.getWidth()) { lasers.remove(k);}
-					k.setxCoord(k.getxCoord() + 1);
-					g.drawImage(k.getImg(), k.getxCoord(), k.getyCoord(), k.getWidth(), k.getHeight(), this);
-									
-					Rectangle kr = new Rectangle(k.getxCoord(), k.getyCoord(), k.getWidth(), k.getHeight());		
-					if (kr.intersects(r)) {
-						badguys.remove(i);
-						lasers.remove(i);
-					}
-				repaint();
-			}
-		}
-		for (int i = 0; i < badguys.size(); i++) {
-			Badguy bg = (Badguy) badguys.get(i);
-			g.drawImage(bg.getImg(), x2, y1, bg.getWidth(), bg.getHeight(), this);
-			Rectangle r = new Rectangle(x2, y1, bg.getWidth(), bg.getHeight());
-			t.start();
-			
-			for (int j = 0; j < 1000000000; j++) {
-				Lasers k = (Lasers) lasers.get(j);
-				if (k.getxCoord() > this.getWidth()) { lasers.remove(k);}
-					k.setxCoord(k.getxCoord() + 1);
-					g.drawImage(k.getImg(), k.getxCoord(), k.getyCoord(), k.getWidth(), k.getHeight(), this);
-									
-					Rectangle kr = new Rectangle(k.getxCoord(), k.getyCoord(), k.getWidth(), k.getHeight());		
-					if (kr.intersects(r)) {
-						badguys.remove(i);
-						lasers.remove(i);
-					}
-				repaint();
-			}
-		}
-		for (int i = 0; i < badguys.size(); i++) {
-			Badguy bg = (Badguy) badguys.get(i);
-			g.drawImage(bg.getImg(), x2, y2, bg.getWidth(), bg.getHeight(), this);
-			Rectangle r = new Rectangle(x2, y2, bg.getWidth(), bg.getHeight());
-			t.start();
-			
-			for (int j = 0; j < 1000000000; j++) {
-				Lasers k = (Lasers) lasers.get(j);
-				if (k.getxCoord() > this.getWidth()) { lasers.remove(k);}
-					k.setxCoord(k.getxCoord() + 1);
-					g.drawImage(k.getImg(), k.getxCoord(), k.getyCoord(), k.getWidth(), k.getHeight(), this);
-									
-					Rectangle kr = new Rectangle(k.getxCoord(), k.getyCoord(), k.getWidth(), k.getHeight());		
-					if (kr.intersects(r)) {
-						badguys.remove(i);
-						lasers.remove(i);
-					}
-				repaint();
-			}
-		}
-	}
-	
-	public void actionPerformed (ActionEvent e) {
-		if (x1 >= 500 && x2 >= 500 && x3 >= 500)
-			x1 = x1 - vel;
-			x2 = x2 - vel;
-			x3 = x3 - vel;
-			repaint();
-		if (((x1 < 500) &&(x2 < 500) && (x3 < 500)) && ((y1 > 0 && y2 > 0)  && (y1 < 900 && y2 < 900))) {
-			y1 = y1 - vel;
-			y2 = y2 - vel;
-		}
-	}
-	
-	
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+					g.setColor(Color.gray);
+					g.fillRect(30, 5, 100, 50);
 
-	@Override
-	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		//sans.moveIt(e.getKeyCode(), 600, 400);
-		fighter.moveIt(e.getKeyCode(), 1440,900);
-		repaint();
-		
-		if (e.getKeyCode() == 32) {
-			Lasers laser = new Lasers(fighter.getxCoord(), fighter.getyCoord(), 20, 20, "sprites/laser.png");
-			lasers.add(laser);
-		}
-		
-		Rectangle ggrect = new Rectangle(fighter.getxCoord(),fighter.getyCoord(),fighter.getWidth(),fighter.getHeight()); 
-		for (int i = 0; i < badguys.size(); i++) {
-			Badguy bg = (Badguy) badguys.get(i);
-			Rectangle r = new Rectangle(bg.getxCoord(), bg.getyCoord(), bg.getWidth(), bg.getHeight());
-			if (r.intersects(ggrect)) {
-				badguys.remove(i);
+					g.setColor(Color.green);
+					g.fillRect(30, 5, health, 50);
+					
+					g.setColor(Color.gray);
+					g.drawRect(30, 5, 100, 50);
+					
+					Font fnt1 = new Font("arial", Font.BOLD, 30);
+					g.setFont(fnt1);
+					g.drawString("HP", 5, 20);
+					
+					g.drawString(String.valueOf(points), 5, 50);
+					
+					g.drawString("Power Ups", 5, 800);
 
-			repaint();
+		
+					if(gameOver) {
+						g.drawImage(loseScreen.getImg(), loseScreen.getxCoord(), loseScreen.getyCoord(), loseScreen.getWidth(), loseScreen.getHeight(), this);
+					}
+				} else if (State == STATE.MENU) {
+					menu.paint(g);
+				}
+				
 			}
-		repaint();
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
 		
-	}
-	
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				//sans.moveIt(e.getKeyCode(), 600, 400);
+				if (State == STATE.GAME) {	
+					fighter.moveIt(e.getKeyCode(), 1440,900);
+					repaint();
+					
+					if (e.getKeyCode() == 32) {
+						Lasers laser = new Lasers(fighter.getxCoord(), fighter.getyCoord() + 25, bulletSizew, bulletSizeh, "sprites/laser.png");
+						lasers.add(laser);
+					}
+					
+					Rectangle ggrect = new Rectangle(fighter.getxCoord(),fighter.getyCoord(),fighter.getWidth(),fighter.getHeight()); 
+					for (int i = 0; i < 1000; i++) {
+						Badguy bg = (Badguy) badguys.get(i);
+						
+						Rectangle r = new Rectangle(bg.getxCoord(), bg.getyCoord(), bg.getWidth(), bg.getHeight());
+						if (r.intersects(ggrect)) {
+							badguys.remove(i);
+							health = health - 20;
+							if (health == 0) {
+								gameOver = true;
+							}
+						repaint();
+						}
+					repaint();
+					}	
+				} 
+				
+			}
+		
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
 }
+
+
+
+	

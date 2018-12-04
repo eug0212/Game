@@ -3,10 +3,12 @@ package Alien;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
 
 import javax.swing.Timer;
 
-public class Badguy {
+public class Badguy implements ActionListener {
 	
 	private int xCoord = 0;
 	private int yCoord = 0;
@@ -16,15 +18,8 @@ public class Badguy {
 	
 		/**
 	 * Goodguy default constructor
+		 * @param imgpath 
 	 */
-	public Badguy() {
-		setxCoord(10);
-		setyCoord(10);
-		setWidth(30);
-		setHeight(30);
-		setImg(".../File/spongebob.jpg");
-	
-	}
 	
 	/**
 	 * Goodguy overloaded constructor
@@ -33,14 +28,40 @@ public class Badguy {
 	 * @param w initial width
 	 * @param h initial height 
 	 */
-	public Badguy(int x, int y, int w, int h, String imgpath) {
+	
+	public Badguy(int x, int y, int width, int height, String imgpath) {
+		Random rand = new Random();
+		int winWidth = this.getWidth();
+		int winHeight = this.getHeight();
+		int rx = rand.nextInt(winWidth);
+		int ry = rand.nextInt(winHeight);
 		setxCoord(x);
 		setyCoord(y);
-		setWidth(w);
-		setHeight(h);
+		setWidth(width);
+		setHeight(height);
 		setImg(imgpath);
 	}
-	
+	public void willactuallymove() {
+		Timer t = new Timer(5, this);
+		if(this.getxCoord() > 500) {
+			int speed = 1;
+			int x = getxCoord();
+			x = x - speed;
+			setxCoord(x);
+			setImg("sprites/badguy1.png");
+		}
+	}
+	public void actionPerformed(ActionEvent e) {
+		if(this.getxCoord() > 500) {
+			int speed = 1;
+			int x = getxCoord();
+			x = x - speed;
+			setxCoord(x);
+			setImg("sprites/badguy1.png");
+		}
+		
+	}
+
 	public void setImg(String imgpath) {
 		this.img = Toolkit.getDefaultToolkit().getImage(imgpath);
 	}
