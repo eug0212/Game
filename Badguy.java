@@ -2,13 +2,9 @@ package Alien;
 
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Random;
 
-import javax.swing.Timer;
-
-public class Badguy implements ActionListener {
+public class Badguy{
 	
 	private int xCoord = 0;
 	private int yCoord = 0;
@@ -41,25 +37,17 @@ public class Badguy implements ActionListener {
 		setHeight(height);
 		setImg(imgpath);
 	}
-	public void willactuallymove() {
-		Timer t = new Timer(5, this);
-		if(this.getxCoord() > 500) {
-			int speed = 1;
-			int x = getxCoord();
-			x = x - speed;
-			setxCoord(x);
-			setImg("sprites/badguy1.png");
-		}
-	}
-	public void actionPerformed(ActionEvent e) {
-		if(this.getxCoord() > 500) {
-			int speed = 1;
-			int x = getxCoord();
-			x = x - speed;
-			setxCoord(x);
-			setImg("sprites/badguy1.png");
-		}
-		
+	public void actions() {
+		int xCoord = this.getxCoord();
+		int yCoord = this.getyCoord();
+		int width = this.getWidth();
+		int height = this.getHeight();
+			if (xCoord >= 1440) {
+				this.setxCoord(xCoord - 5);
+			}
+			if (xCoord <= 1440) {
+				this.setxCoord(xCoord - 1);
+			}
 	}
 
 	public void setImg(String imgpath) {

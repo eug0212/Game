@@ -13,15 +13,8 @@ public class KeyPressed implements KeyListener{
 	}
 
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == 49) {
+		if (e.getKeyCode() == 32) {
 			MyCanvas.State = MyCanvas.STATE.GAME;
-			MyCanvas.period = 100L;
-		} else if ( e.getKeyCode() == 50) {
-			MyCanvas.State = MyCanvas.STATE.GAME;
-			MyCanvas.period = 75L;
-		} else if (e.getKeyCode() == 51){
-			MyCanvas.State = MyCanvas.STATE.GAME;
-			MyCanvas.period = 50L;
 		}
 	}
 

@@ -3,6 +3,9 @@ package Alien;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Objects {
 	
@@ -19,8 +22,7 @@ public class Objects {
 		setHeight(h);
 		setImg(imgpath);
 	}
-	
-	
+
 	
 	public void setImg(String imgpath) {
 		this.img = Toolkit.getDefaultToolkit().getImage(imgpath);
